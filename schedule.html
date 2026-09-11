@@ -3,24 +3,37 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#131c26">
-<title>2026 西日本ジュニア体操競技選手権大会｜時程</title>
+<meta name="theme-color" content="#10151d">
+<title>アジア競技大会2026 体操競技 TO日程</title>
 <style>
+/* ============================================================
+   大会リアルタイム時程 テンプレート
+   男子=紺 / 女子=赤。新しい大会を作るときは：
+   1) <title> と MEET（title/venue）を書き換える
+   2) SCHEDULE_DEFAULT を差し替える（書式はコメント参照）
+   3) タブ（本会場／サブ／会議／式典）とナウボードは、実際に
+      データが存在するカテゴリだけを自動判定して表示する。
+      サブが無い大会ならサブタブは自動的に出ない。
+   4) 本会場／サブの列は、男女どちらのデータもあれば2列、
+      片方しか無ければ自動的に1列表示になる。
+   男子=紺 / 女子=赤（原本の日程表の配色に合わせる）
+   ============================================================ */
 :root{
-  --bg:#131c26; --bg2:#0e161e; --panel:#1b2733; --panel2:#22303e;
-  --line:#31424f; --ink:#e9eef3; --ink2:#a7b6c4; --ink3:#6f8494;
-  --chalk:#f2f5f7;
-  --live:#f0a531; --next:#48c2d8; --done:#5b6f7e;
+  --bg:#10151d; --bg2:#0b1017; --panel:#182031; --panel2:#1f2a3d;
+  --line:#2e3c52; --ink:#e9edf4; --ink2:#a4b1c5; --ink3:#6d7d96;
+  --chalk:#f4f6fa; --chalk-ink:#0e141c;
+  --live:#f0a531; --next:#4cc3d9; --done:#5b6a80;
+  --men:#4f83ff; --men2:#1c3fae; --women:#ff5d5d; --women2:#c21f2f; --both:#93a1b6;
   --warn:#ff8a5c; --ok:#57c98a;
-  --c1:#5b8dee; --c2:#e2698f; --c3:#57c98a; --c4:#c58ce8; --c5:#e8b45c; --c0:#8f9db0;
   --r:10px;
   --font-jp:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP","BIZ UDPGothic","Yu Gothic UI",Meiryo,sans-serif;
   --font-num:ui-monospace,"SFMono-Regular","DIN Alternate","Roboto Mono",Menlo,Consolas,monospace;
 }
 html[data-theme="light"]{
-  --bg:#eef2f5; --bg2:#e3e9ee; --panel:#ffffff; --panel2:#f4f7f9;
-  --line:#cfd9e1; --ink:#16222d; --ink2:#4d6070; --ink3:#7d90a0;
-  --chalk:#16222d; --done:#9aa9b5;
+  --bg:#eef1f6; --bg2:#e2e7ef; --panel:#ffffff; --panel2:#f3f6fa;
+  --line:#ccd6e2; --ink:#16202e; --ink2:#4b5d75; --ink3:#7b8ca3;
+  --chalk:#16202e; --chalk-ink:#f4f6fa; --done:#9aa8ba;
+  --men:#2b5fd9; --women:#d92b3c;
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
@@ -28,14 +41,12 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font-jp);font-size:
   -webkit-text-size-adjust:100%;padding-bottom:env(safe-area-inset-bottom)}
 h1,h2,h3{margin:0;font-weight:700;letter-spacing:.02em}
 button,input,select,textarea{font:inherit;color:inherit}
-a{color:var(--next)}
 .num{font-family:var(--font-num);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
 
 .stickytop{position:sticky;top:0;z-index:30}
 .topbar{background:linear-gradient(180deg,var(--bg2),var(--bg));border-bottom:1px solid var(--line);padding:10px 14px 8px}
 .tb-row{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
-.eyebrow{font-size:10.5px;letter-spacing:.22em;color:var(--ink3);text-transform:uppercase;
-  max-width:52vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.eyebrow{font-size:10.5px;letter-spacing:.18em;color:var(--ink3)}
 .clock{font-family:var(--font-num);font-variant-numeric:tabular-nums;
   font-size:clamp(30px,9vw,46px);font-weight:600;line-height:1;letter-spacing:-.02em;color:var(--chalk)}
 .clock .sec{font-size:.5em;color:var(--ink3);margin-left:2px}
@@ -47,92 +58,94 @@ a{color:var(--next)}
 .iconbtn{background:var(--panel);border:1px solid var(--line);color:var(--ink2);
   border-radius:8px;padding:6px 9px;font-size:12px;cursor:pointer}
 .iconbtn:hover{color:var(--ink);border-color:var(--ink3)}
-
-.tabs{display:flex;gap:2px;padding:0 8px;background:var(--bg);border-bottom:1px solid var(--line);
-  overflow-x:auto;-webkit-overflow-scrolling:touch}
-.tab{flex:1 0 auto;background:none;border:0;border-bottom:2px solid transparent;color:var(--ink3);
-  padding:11px 12px;font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap}
-.tab[aria-selected="true"]{color:var(--chalk);border-bottom-color:var(--live)}
 main{max-width:1100px;margin:0 auto;padding:14px 12px 90px}
 .view{display:none}.view.on{display:block}
 
-.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
-.card > h2{font-size:14px;letter-spacing:.06em;color:var(--ink2);margin-bottom:10px}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
-label.f{display:block;font-size:11.5px;color:var(--ink3);letter-spacing:.08em;margin-bottom:4px}
-input[type=text],input[type=number],input[type=date],input[type=time],input[type=datetime-local],select,textarea{
-  width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
-textarea{min-height:210px;font-family:var(--font-num);font-size:12px;line-height:1.5}
-input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid var(--next);outline-offset:1px}
-.btn{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:9px 14px;
-  font-size:13.5px;font-weight:600;cursor:pointer;color:var(--ink)}
-.btn:hover{border-color:var(--ink3)}
-.btn.primary{background:var(--live);border-color:var(--live);color:#20160a}
-.btn.ghost{background:none}
-.btn.danger{color:var(--warn);border-color:var(--warn);background:none}
+.note{font-size:12px;color:var(--ink3)}
 .badge{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.08em;
   padding:2px 7px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.b-men{color:var(--men)} .b-women{color:var(--women)} .b-both{color:var(--both)}
 .b-live{color:var(--live);background:rgba(240,165,49,.12)}
 .b-check{color:var(--warn)}
-.note{font-size:12px;color:var(--ink3)}
-.hint{font-size:12px;color:var(--ink2);background:var(--panel2);border-left:3px solid var(--next);
-  padding:8px 10px;border-radius:0 8px 8px 0;margin:8px 0}
 .warnbar{font-size:12.5px;color:#3a2410;background:var(--warn);border-radius:8px;padding:8px 11px;margin-bottom:12px}
 
+/* ---------- 署名要素：ナウボード ---------- */
+.board{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-bottom:14px}
+.bcell{background:linear-gradient(135deg,var(--panel2),var(--panel));border:1px solid var(--line);
+  border-radius:var(--r);padding:11px 13px;position:relative;overflow:hidden}
+.bcell.live{border-color:var(--live)}
+.bcell .lbl{font-size:10px;letter-spacing:.2em;color:var(--ink3);display:flex;justify-content:space-between}
+.bcell .lbl .st{color:var(--live);font-weight:700}
+.bcell .ttl{font-size:15.5px;font-weight:700;margin:4px 0 1px;line-height:1.35}
+.bcell .sub{font-size:12px;color:var(--ink2)}
+.bcell .cd{font-family:var(--font-num);font-size:13px;color:var(--live)}
+.bcell.idle .ttl{color:var(--ink3);font-weight:600;font-size:13.5px}
+
+.filters{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:8px}
+.fchip{flex:0 0 auto;background:var(--panel);border:1px solid var(--line);border-radius:999px;
+  padding:5px 13px;font-size:12.5px;cursor:pointer;color:var(--ink2)}
+.fchip[aria-pressed="true"]{background:var(--chalk);color:var(--chalk-ink);border-color:var(--chalk);font-weight:700}
 .daychips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px}
 .chip{flex:0 0 auto;background:var(--panel);border:1px solid var(--line);border-radius:999px;
   padding:6px 13px;font-size:12.5px;cursor:pointer;color:var(--ink2)}
-.chip[aria-pressed="true"]{background:var(--chalk);color:#0e161e;border-color:var(--chalk);font-weight:700}
+.chip[aria-pressed="true"]{background:var(--chalk);color:var(--chalk-ink);border-color:var(--chalk);font-weight:700}
 .chip small{display:block;font-size:10px;opacity:.7}
 .chip .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--live);margin-left:5px;vertical-align:middle}
 
 .rail{position:relative;padding-left:78px}
 .rail:before{content:"";position:absolute;left:70px;top:4px;bottom:4px;width:1px;background:var(--line)}
 .ev{position:relative;margin-bottom:8px;background:var(--panel);border:1px solid var(--line);
-  border-radius:var(--r);padding:10px 12px}
-.ev .t{position:absolute;left:-78px;top:10px;width:62px;text-align:right;
+  border-radius:var(--r);padding:9px 12px;border-left-width:3px}
+.ev.men{border-left-color:var(--men)} .ev.women{border-left-color:var(--women)} .ev.both{border-left-color:var(--both)}
+.ev .t{position:absolute;left:-78px;top:9px;width:62px;text-align:right;
   font-family:var(--font-num);font-variant-numeric:tabular-nums;font-size:14px;color:var(--ink2)}
 .ev .t small{display:block;font-size:11px;color:var(--ink3)}
-.ev:after{content:"";position:absolute;left:-11px;top:17px;width:9px;height:9px;border-radius:50%;
+.ev:after{content:"";position:absolute;left:-11px;top:16px;width:9px;height:9px;border-radius:50%;
   background:var(--bg);border:2px solid var(--line)}
-.ev.done{opacity:.45}
+.ev.done{opacity:.42}
 .ev.done:after{background:var(--done);border-color:var(--done)}
-.ev.live{border-color:var(--live);box-shadow:0 0 0 1px var(--live) inset,0 6px 22px -12px var(--live)}
+.ev.live{border-color:var(--live);border-left-color:var(--live);
+  box-shadow:0 0 0 1px var(--live) inset,0 6px 22px -12px var(--live)}
 .ev.live:after{background:var(--live);border-color:var(--live)}
 .ev.next:after{background:var(--next);border-color:var(--next)}
-.ev.check{border-style:dashed}
+.ev.chk{border-style:dashed;border-left-style:solid}
 .ev h3{font-size:15px;margin-bottom:2px}
-.ev .meta{font-size:12px;color:var(--ink2);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.ev .memo{font-size:12.5px;color:var(--ink2);margin-top:4px}
-.ev .issue{font-size:12.5px;color:var(--ink2);margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.ev .issue b{font-family:var(--font-num);color:var(--chalk)}
+.ev .meta{font-size:11.5px;color:var(--ink2);display:flex;gap:7px;flex-wrap:wrap;align-items:center}
 .nowline{position:relative;height:0;margin:14px 0}
 .nowline:before{content:"";position:absolute;left:-78px;right:0;top:0;height:2px;
   background:linear-gradient(90deg,var(--live),rgba(240,165,49,0));border-radius:2px}
 .nowline span{position:absolute;left:-78px;top:-9px;font-family:var(--font-num);font-size:11px;
   font-weight:700;color:#20160a;background:var(--live);border-radius:4px;padding:1px 5px}
-.chk{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--ink3);cursor:pointer}
-.chk input{width:15px;height:15px;accent-color:var(--ok)}
 
-.nowcard{background:linear-gradient(135deg,var(--panel2),var(--panel));border:1px solid var(--line);
-  border-left:3px solid var(--live);border-radius:var(--r);padding:14px;margin-bottom:14px}
-.nowcard .lbl{font-size:10.5px;letter-spacing:.22em;color:var(--ink3)}
-.nowcard .ttl{font-size:19px;font-weight:700;margin:3px 0 2px}
-.nowcard .cd{font-family:var(--font-num);font-size:30px;font-weight:600;color:var(--live);line-height:1.1}
-.nowcard .sub{font-size:12.5px;color:var(--ink2)}
-
-.editrow{display:grid;grid-template-columns:88px 88px 96px 1fr 88px 34px;gap:5px;margin-bottom:5px;align-items:center}
-.editrow input,.editrow select{padding:6px 8px;font-size:12.5px}
-.editrow .del{background:none;border:1px solid var(--line);border-radius:7px;color:var(--warn);cursor:pointer;padding:5px 0}
-.edithead{display:grid;grid-template-columns:88px 88px 96px 1fr 88px 34px;gap:5px;font-size:10.5px;
-  color:var(--ink3);letter-spacing:.06em;margin-bottom:4px;padding:0 2px}
-@media (max-width:720px){
-  .editrow,.edithead{grid-template-columns:1fr 1fr;}
-  .edithead{display:none}
-  .editrow{border:1px solid var(--line);border-radius:8px;padding:8px;margin-bottom:8px}
-  .editrow .wide{grid-column:1/3}
+/* ---------- 男女2列表示（本会場／サブ） ---------- */
+.common-bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.common-chip{background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  padding:5px 10px;font-size:12px;color:var(--ink2);display:flex;gap:6px;align-items:center}
+.common-chip.live{border-color:var(--live);color:var(--chalk)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.col-head{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;
+  color:var(--ink2);margin-bottom:8px;letter-spacing:.05em}
+.col-head .dot{width:8px;height:8px;border-radius:50%;background:var(--both)}
+.col-head.men .dot{background:var(--men)} .col-head.women .dot{background:var(--women)}
+.colrail{display:flex;flex-direction:column;gap:6px}
+.cev{background:var(--panel);border:1px solid var(--line);border-left-width:3px;
+  border-radius:8px;padding:7px 9px}
+.cev.men{border-left-color:var(--men)} .cev.women{border-left-color:var(--women)}
+.cev.done{opacity:.42}
+.cev.live{border-color:var(--live);border-left-color:var(--live);box-shadow:0 0 0 1px var(--live) inset}
+.cev.next{box-shadow:0 0 0 1px var(--next) inset}
+.cev.chk{border-style:dashed;border-left-style:solid}
+.cev .ct{font-family:var(--font-num);font-size:11.5px;color:var(--ink2)}
+.cev h4{font-size:12.5px;margin:2px 0 0;font-weight:700;line-height:1.3}
+.cev .cmeta{font-size:10px;color:var(--ink2);margin-top:3px;display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.colnow{font-size:10.5px;color:var(--live);font-weight:700;text-align:center;
+  padding:2px 0;border-top:1px dashed var(--live);border-bottom:1px dashed var(--live);margin:2px 0}
+@media (max-width:400px){
+  .cols{gap:6px}
+  .cev{padding:6px 7px}
+  .cev h4{font-size:11.5px}
 }
+
 @media (max-width:640px){
   main{padding:12px 10px 90px}
   .rail{padding-left:62px}.rail:before{left:54px}
@@ -140,11 +153,7 @@ input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid v
   .nowline:before,.nowline span{left:-62px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-@media print{.stickytop,.noprint{display:none!important}main{padding:0}
-  .ev{break-inside:avoid} @page{size:A4;margin:12mm}}
-.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:99;
-  background:var(--chalk);color:#0e161e;font-size:13px;font-weight:600;padding:10px 16px;
-  border-radius:999px;box-shadow:0 10px 30px -10px #000;max-width:90vw}
+@media print{.stickytop,.noprint{display:none!important}main{padding:0}.ev{break-inside:avoid}@page{size:A4;margin:12mm}}
 </style>
 </head>
 <body>
@@ -153,7 +162,7 @@ input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid v
 <header class="topbar">
   <div class="tb-row">
     <div>
-      <div class="eyebrow" id="eyebrow">大会時程</div>
+      <div class="eyebrow" id="eyebrow">アジア競技大会2026 体操競技 TO日程</div>
       <div class="clock num" id="clock">--:--<span class="sec">--</span></div>
     </div>
     <div class="datebox" id="datebox">—</div>
@@ -162,459 +171,324 @@ input:focus,select:focus,textarea:focus,button:focus-visible{outline:2px solid v
     <button class="iconbtn" id="themeBtn" title="表示切替">◐</button>
   </div>
 </header>
-<nav class="tabs" role="tablist">
-  <button class="tab" role="tab" data-view="schedule" aria-selected="true">時程</button>
-  <button class="tab" role="tab" data-view="settings" aria-selected="false">設定</button>
-</nav>
-</div>
 
 <main>
 <section class="view on" id="view-schedule">
   <div id="checkWarn"></div>
-  <div id="nowcard"></div>
+  <div class="board" id="board"></div>
+  <div class="filters" id="filters"></div>
   <div class="daychips" id="daychips"></div>
-  <div class="rail" id="rail"></div>
-  <p class="note noprint">チェックはこの端末に保存されます。時程を変えるときは設定タブへ。</p>
-</section>
-
-<section class="view" id="view-settings">
-  <div class="card">
-    <h2>大会情報</h2>
-    <div class="grid">
-      <div><label class="f">大会名</label><input type="text" id="sTitle" placeholder="◯◯大会"></div>
-      <div><label class="f">会場</label><input type="text" id="sVenue" placeholder="◯◯体育館"></div>
-      <div><label class="f">カウントダウンの基準（開始日時）</label><input type="datetime-local" id="sStart"></div>
-      <div><label class="f">保存キー（大会ごとに変える）</label><input type="text" id="sKey" placeholder="meet2026a"></div>
-    </div>
-    <div class="hint">保存キーを大会ごとに変えると、チェック状態が混ざりません。同じURLで複数大会を使い回す場合に。</div>
-  </div>
-
-  <div class="card">
-    <h2>時程を編集</h2>
-    <div class="row" style="margin-bottom:10px">
-      <div style="flex:0 0 auto"><label class="f">編集する日</label>
-        <select id="edDay" style="min-width:160px"></select></div>
-      <div style="align-self:flex-end;display:flex;gap:6px">
-        <button class="btn" id="addDay">日を追加</button>
-        <button class="btn danger" id="delDay">この日を削除</button>
-      </div>
-    </div>
-    <div class="edithead">
-      <span>開始</span><span>終了</span><span>区分</span><span>内容</span><span>要チェック時刻</span><span></span>
-    </div>
-    <div id="edRows"></div>
-    <div class="row" style="margin-top:8px">
-      <button class="btn" id="addRow">行を追加</button>
-      <button class="btn primary" id="saveRows">保存して反映</button>
-    </div>
-    <div class="hint">「要チェック時刻」は、その時刻までに終える作業（速報発行・掲示・提出など）。空欄でかまいません。
-      区分は自由に書けます（男子／女子／A面／設営 など）。同じ名前には同じ色が付きます。</div>
-  </div>
-
-  <div class="card">
-    <h2>まとめて入力</h2>
-    <p class="note">1行1件。<b>日付,開始,終了,区分,内容,要チェック時刻,備考</b> の順にカンマ区切り。
-      日付を省くと直前の行と同じ日になります。Excelからそのまま貼り付けられます。</p>
-    <textarea id="bulk" spellcheck="false" placeholder="2026-08-01,09:00,10:30,男子,予選 1班,10:45,速報No.1
-,10:40,12:05,男子,予選 2班,12:20,
-,13:00,,共通,監督会議,,会議室A"></textarea>
-    <div class="row" style="margin-top:10px">
-      <button class="btn primary" id="bulkApply">この内容に置き換える</button>
-      <button class="btn" id="bulkLoad">現在の時程を読み込む</button>
-    </div>
-  </div>
-
-  <div class="card">
-    <h2>保存・持ち出し</h2>
-    <div class="row">
-      <button class="btn" id="expJson">時程をJSONで保存</button>
-      <button class="btn" id="impJson">JSONを読み込む</button>
-      <button class="btn" id="expCsv">CSVで保存</button>
-      <button class="btn ghost" id="clearChk">チェックを全部外す</button>
-      <button class="btn danger" id="resetAll">初期状態に戻す</button>
-    </div>
-    <input type="file" id="impFile" accept=".json,application/json" hidden>
-    <div class="hint">JSONを配れば、他の端末でも同じ時程を読み込めます。設定タブの内容も一緒に入ります。</div>
-  </div>
-
-  <div class="card">
-    <h2>表示の確認</h2>
-    <div class="grid">
-      <div><label class="f">日時を仮に設定（本番前の見え方を確認）</label><input type="datetime-local" id="sFakeNow"></div>
-    </div>
-    <div class="row" style="margin-top:10px">
-      <button class="btn" id="fakeApply">この日時で表示</button>
-      <button class="btn ghost" id="fakeClear">実時刻に戻す</button>
-    </div>
-  </div>
+  <div id="rail"></div>
+  <p class="note noprint">「第○班」＝Subdivision（競技班）／FOP＝主競技場。会場表記はPDF原本に準拠。開会式の時刻は原本に記載がなく未定（要確認）。</p>
 </section>
 </main>
 
 <script>
-/* ---------- 保存 ---------- */
-let NS='wj2026';
+/* ============ 保存 ============ */
+const NS='ag2026gar';
 const store=(()=>{let mem={},ok=true;
   try{localStorage.setItem('__t','1');localStorage.removeItem('__t');}catch(e){ok=false;}
   return{
     get(k,d){const key=NS+':'+k;try{if(ok){const v=localStorage.getItem(key);return v==null?d:JSON.parse(v);}}catch(e){}
       return key in mem?mem[key]:d;},
     set(k,v){const key=NS+':'+k;try{if(ok){localStorage.setItem(key,JSON.stringify(v));return;}}catch(e){}mem[key]=v;},
-    del(k){const key=NS+':'+k;try{if(ok){localStorage.removeItem(key);return;}}catch(e){}delete mem[key];},
-    keys(){try{if(ok)return Object.keys(localStorage);}catch(e){}return Object.keys(mem);}
+    clearAll(){try{Object.keys(localStorage).filter(k=>k.startsWith(NS+':')).forEach(k=>localStorage.removeItem(k));}catch(e){}mem={};}
   };})();
-function readNS(){try{return localStorage.getItem('meet:ns')||'wj2026';}catch(e){return 'wj2026';}}
-function writeNS(v){try{localStorage.setItem('meet:ns',v);}catch(e){}}
-NS=readNS();
-
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;
-  document.body.appendChild(t);setTimeout(()=>t.remove(),2600);}
 
-/* ---------- 初期データ：2026 西日本ジュニア体操競技選手権大会 ---------- */
-function sample(){
-  return[
-    {d:"2026-07-22",items:[
-      {"s": "13:00", "e": "", "cat": "共通", "title": "受付開始", "issue": "", "memo": ""},
-      {"s": "15:00", "e": "15:48", "cat": "女子", "title": "C1 割当練習　48分（12×4）", "issue": "", "memo": ""},
-      {"s": "15:55", "e": "16:43", "cat": "女子", "title": "C2 割当練習　48分（12×4）", "issue": "", "memo": ""},
-      {"s": "16:50", "e": "17:50", "cat": "女子", "title": "B1 割当練習　60分（12×5）", "issue": "", "memo": ""}]},
-    {d:"2026-07-23",items:[
-      {"s": "07:30", "e": "", "cat": "共通", "title": "開館", "issue": "", "memo": ""},
-      {"s": "08:20", "e": "09:10", "cat": "共通", "title": "女子C・Bクラス 審判会議／操作説明", "issue": "", "memo": ""},
-      {"s": "08:30", "e": "09:18", "cat": "女子", "title": "C1 割当練習　48分（12×4）", "issue": "", "memo": ""},
-      {"s": "09:20", "e": "09:30", "cat": "共通", "title": "開始式", "issue": "", "memo": ""},
-      {"s": "09:30", "e": "11:06", "cat": "女子", "title": "C1 競技　96分（6人4組）", "issue": "", "memo": ""},
-      {"s": "11:15", "e": "12:03", "cat": "女子", "title": "C2 割当練習　48分（12×4）", "issue": "", "memo": ""},
-      {"s": "12:03", "e": "13:39", "cat": "女子", "title": "C2 競技　96分（6人4組）", "issue": "", "memo": ""},
-      {"s": "13:50", "e": "14:50", "cat": "女子", "title": "B1 割当練習　60分（12×5）", "issue": "", "memo": ""},
-      {"s": "14:00", "e": "14:40", "cat": "共通", "title": "女子Cクラス 表彰式", "issue": "", "memo": ""},
-      {"s": "14:50", "e": "16:50", "cat": "女子", "title": "B1 競技　120分（6人5組）", "issue": "", "memo": ""},
-      {"s": "15:00", "e": "16:24", "cat": "男子", "title": "B1 フリー練習　84分", "issue": "", "memo": "※男子フリー練習は平行棒のみ割り当て練習"},
-      {"s": "16:30", "e": "17:42", "cat": "男子", "title": "B2 フリー練習　72分", "issue": "", "memo": "※男子フリー練習は平行棒のみ割り当て練習"},
-      {"s": "17:00", "e": "17:50", "cat": "女子", "title": "B2 割当練習　50分（10×5）", "issue": "", "memo": ""},
-      {"s": "17:50", "e": "18:38", "cat": "女子", "title": "B3 割当練習　48分（12×4）", "issue": "", "memo": ""},
-      {"s": "18:40", "e": "19:28", "cat": "女子", "title": "B4 割当練習　48分（12×4）", "issue": "", "memo": ""},
-      {"s": "19:28", "e": "20:16", "cat": "女子", "title": "B5 割当練習　48分（12×4）", "issue": "", "memo": ""}]},
-    {d:"2026-07-24",items:[
-      {"s": "07:30", "e": "", "cat": "共通", "title": "開館", "issue": "", "memo": ""},
-      {"s": "08:30", "e": "09:20", "cat": "女子", "title": "B2 割当練習　50分（10×5）", "issue": "", "memo": ""},
-      {"s": "08:30", "e": "10:00", "cat": "男子", "title": "B1 フリー練習　90分", "issue": "", "memo": "※男子フリー練習は平行棒のみ割り当て練習"},
-      {"s": "08:45", "e": "09:45", "cat": "共通", "title": "男子Bクラス 審判会議／操作説明", "issue": "", "memo": ""},
-      {"s": "09:20", "e": "11:00", "cat": "女子", "title": "B2 競技　100分（5人5組）", "issue": "", "memo": ""},
-      {"s": "10:00", "e": "12:34", "cat": "男子", "title": "B1 競技　154分（6人7組）", "issue": "", "memo": ""},
-      {"s": "11:10", "e": "11:58", "cat": "女子", "title": "B3 割当練習　48分（12×4）", "issue": "", "memo": ""},
-      {"s": "11:58", "e": "13:34", "cat": "女子", "title": "B3 競技　96分（6人4組）", "issue": "", "memo": ""},
-      {"s": "12:40", "e": "14:10", "cat": "男子", "title": "B2 フリー練習　90分", "issue": "", "memo": "※男子フリー練習は平行棒のみ割り当て練習"},
-      {"s": "13:45", "e": "14:33", "cat": "女子", "title": "B4 割当練習　48分（12×4）", "issue": "", "memo": ""},
-      {"s": "14:10", "e": "16:22", "cat": "男子", "title": "B2 競技　132分（6人6組）", "issue": "", "memo": ""},
-      {"s": "14:33", "e": "16:09", "cat": "女子", "title": "B4 競技　96分（6人4組）", "issue": "", "memo": ""},
-      {"s": "16:20", "e": "17:08", "cat": "女子", "title": "B5 割当練習　48分（12×4）", "issue": "", "memo": ""},
-      {"s": "16:22", "e": "16:40", "cat": "男子", "title": "器具入替", "issue": "", "memo": ""},
-      {"s": "16:40", "e": "17:52", "cat": "男子", "title": "A1 フリー練習　72分", "issue": "", "memo": "※男子フリー練習は平行棒のみ割り当て練習"},
-      {"s": "17:00", "e": "17:40", "cat": "共通", "title": "男子Bクラス 表彰式", "issue": "", "memo": ""},
-      {"s": "17:08", "e": "18:44", "cat": "女子", "title": "B5 競技　96分（6人4組）", "issue": "", "memo": ""},
-      {"s": "17:55", "e": "19:07", "cat": "男子", "title": "A2 フリー練習　72分", "issue": "", "memo": "※男子フリー練習は平行棒のみ割り当て練習"},
-      {"s": "18:55", "e": "19:27", "cat": "女子", "title": "A1 割当練習　32分（8×4）", "issue": "", "memo": ""},
-      {"s": "19:00", "e": "19:40", "cat": "共通", "title": "女子Bクラス 表彰式", "issue": "", "memo": ""},
-      {"s": "19:27", "e": "20:07", "cat": "女子", "title": "A2 割当練習　40分（10×4）", "issue": "", "memo": ""},
-      {"s": "20:07", "e": "20:47", "cat": "女子", "title": "A3 割当練習　40分（10×4）", "issue": "", "memo": ""}]},
-    {d:"2026-07-25",items:[
-      {"s": "07:30", "e": "", "cat": "共通", "title": "開館", "issue": "", "memo": ""},
-      {"s": "08:30", "e": "10:00", "cat": "男子", "title": "A1 フリー練習　90分", "issue": "", "memo": "※男子フリー練習は平行棒のみ割り当て練習"},
-      {"s": "08:45", "e": "09:45", "cat": "共通", "title": "Aクラス 審判会議／操作説明", "issue": "", "memo": ""},
-      {"s": "09:20", "e": "10:00", "cat": "女子", "title": "A1 割当練習　40分（10×4）", "issue": "", "memo": ""},
-      {"s": "10:00", "e": "11:20", "cat": "女子", "title": "A1 競技　80分（5人4組）", "issue": "", "memo": ""},
-      {"s": "10:00", "e": "12:12", "cat": "男子", "title": "A1 競技　132分（5人6組）", "issue": "", "memo": ""},
-      {"s": "11:30", "e": "12:18", "cat": "女子", "title": "A2 割当練習　48分（12×4）", "issue": "", "memo": ""},
-      {"s": "12:15", "e": "13:45", "cat": "男子", "title": "A2 フリー練習　90分", "issue": "", "memo": "※男子フリー練習は平行棒のみ割り当て練習"},
-      {"s": "12:18", "e": "13:54", "cat": "女子", "title": "A2 競技　96分（6人4組）", "issue": "", "memo": ""},
-      {"s": "13:45", "e": "15:57", "cat": "男子", "title": "A2 競技　132分（5人6組）", "issue": "", "memo": ""},
-      {"s": "14:05", "e": "14:53", "cat": "女子", "title": "A3 割当練習　48分（12×4）", "issue": "", "memo": ""},
-      {"s": "14:53", "e": "16:29", "cat": "女子", "title": "A3 競技　96分（6人4組）", "issue": "", "memo": ""},
-      {"s": "16:00", "e": "17:12", "cat": "男子", "title": "A3 フリー練習　72分", "issue": "", "memo": "※男子フリー練習は平行棒のみ割り当て練習"},
-      {"s": "16:40", "e": "17:12", "cat": "女子", "title": "A4 割当練習　32分（8×4）", "issue": "", "memo": ""}]},
-    {d:"2026-07-26",items:[
-      {"s": "07:30", "e": "", "cat": "共通", "title": "開館", "issue": "", "memo": ""},
-      {"s": "08:30", "e": "10:00", "cat": "男子", "title": "A3 フリー練習　90分", "issue": "", "memo": ""},
-      {"s": "09:20", "e": "10:00", "cat": "女子", "title": "A4 割当練習　40分（10×4）", "issue": "", "memo": ""},
-      {"s": "10:00", "e": "11:20", "cat": "女子", "title": "A4 競技　80分（5人4組）", "issue": "", "memo": ""},
-      {"s": "10:00", "e": "12:12", "cat": "男子", "title": "A3 競技　132分（6人6組）", "issue": "", "memo": ""},
-      {"s": "12:30", "e": "13:00", "cat": "共通", "title": "Aクラス 表彰式", "issue": "", "memo": ""},
-      {"s": "13:00", "e": "16:00", "cat": "共通", "title": "会場器具カッティング", "issue": "", "memo": ""}]}];
-}
+/* ============ 時程データ ============
+   新しい大会用に、この SCHEDULE_DEFAULT と MEET を丸ごと差し替える。
 
-let MEET=Object.assign({title:"2026 西日本ジュニア体操競技選手権大会",venue:"内村記念アリーナ",start:"2026-07-22T13:00",key:NS},store.get('meet',{}));
-let SCHEDULE=store.get('sched',null)||sample();
+   1件のフォーマット: {s:開始, e:終了(単発なら""), c:カテゴリ, g:区分, t:内容, m:備考(省略可), k:1(時刻未確定なら)}
+   c（カテゴリ）: "本会場" / "サブ" / "会議"（審判会議・リーダー会議など）/ "式典"（開会式・表彰式など）
+     - 実際にデータが存在するカテゴリだけ、タブとナウボードに自動で出る。
+       サブが無い大会なら c:"サブ" の行を1件も書かなければサブタブは出ない。
+   g（区分）: "男子" / "女子" / "共通"
+     - 本会場・サブの列は、男女どちらのデータもあれば2列、片方しか無ければ自動で1列になる。
+     - g:"共通" は開館・受付・退館など男女に関係ない項目（2列表示の上に横バーで出る）。
+   時刻は "HH:MM"（24時間表記）。日をまたぐ大会は d を "YYYY-MM-DD" で分けて配列に足す。 */
+const M='男子',W='女子',B='共通';
+const SCHEDULE_DEFAULT=[
+{d:"2026-09-16",open:"10:00",items:[
+ {s:"10:00",e:"12:00",c:"会議",g:M,t:"男子 技術委員会（TC）会議",m:"TD Room"}]},
+{d:"2026-09-17",open:"13:00",items:[
+ {s:"13:00",e:"18:00",c:"会議",g:W,t:"女子 技術委員会（TC）会議",m:"TD Room"},
+ {s:"15:00",e:"18:00",c:"会議",g:M,t:"男子 審判説明・抽選（Instruction & Draw）",m:"Press Conf. Room"}]},
+{d:"2026-09-18",open:"9:00",items:[
+ {s:"09:00",e:"09:30",c:"会議",g:M,t:"男子 審判会議（Briefing）",m:"Press Conf. Room"},
+ {s:"10:00",e:"12:30",c:"本会場",g:M,t:"男子 公式練習（ポディウム）第1班"},
+ {s:"14:30",e:"17:00",c:"本会場",g:M,t:"男子 公式練習（ポディウム）第2班"},
+ {s:"15:00",e:"18:00",c:"会議",g:W,t:"女子 審判説明・抽選（Instruction & Draw）",m:"Press Conf. Room"}]},
+{d:"2026-09-19",open:"",items:[
+ {s:"",e:"",c:"式典",g:B,t:"開会式（Opening Ceremony）",k:1,m:"時刻未定"}]},
+{d:"2026-09-20",open:"11:00",items:[
+ {s:"11:00",e:"12:00",c:"会議",g:W,t:"女子 審判会議（Briefing）",m:"Press Conf. Room"},
+ {s:"12:00",e:"13:40",c:"本会場",g:W,t:"女子 公式練習（ポディウム）第1班"},
+ {s:"14:00",e:"15:40",c:"本会場",g:W,t:"女子 公式練習（ポディウム）第2班"},
+ {s:"17:30",e:"19:10",c:"本会場",g:W,t:"女子 公式練習（ポディウム）第3班"}]},
+{d:"2026-09-21",open:"9:00",items:[
+ {s:"09:00",e:"09:30",c:"会議",g:M,t:"男子 審判会議（Briefing）",m:"Press Conf. Room"},
+ {s:"10:00",e:"12:30",c:"本会場",g:M,t:"男子 予選・個人総合 第1班"},
+ {s:"14:30",e:"17:00",c:"本会場",g:M,t:"男子 予選・個人総合 第2班"},
+ {s:"17:00",e:"17:15",c:"式典",g:M,t:"表彰式（Victory Ceremony）"}]},
+{d:"2026-09-22",open:"10:15",items:[
+ {s:"10:15",e:"11:30",c:"会議",g:W,t:"女子 審判会議（Briefing）",m:"Press Conf. Room"},
+ {s:"12:00",e:"13:40",c:"本会場",g:W,t:"女子 予選・個人総合 第1班"},
+ {s:"14:00",e:"15:40",c:"本会場",g:W,t:"女子 予選・個人総合 第2班"},
+ {s:"17:30",e:"19:10",c:"本会場",g:W,t:"女子 予選・個人総合 第3班"},
+ {s:"19:10",e:"19:25",c:"式典",g:W,t:"表彰式（Victory Ceremony）"}]},
+{d:"2026-09-23",open:"11:30",items:[
+ {s:"11:30",e:"12:00",c:"会議",g:M,t:"男子 審判会議・抽選（MTG & Draw）",m:"Press Conf. Room"},
+ {s:"13:00",e:"15:30",c:"本会場",g:M,t:"男子 団体決勝（Team Final）"},
+ {s:"15:30",e:"15:55",c:"式典",g:M,t:"表彰式（団体）"},
+ {s:"17:30",e:"18:30",c:"会議",g:W,t:"女子 審判会議・抽選（MTG & Draw）",m:"Press Conf. Room"},
+ {s:"19:00",e:"21:00",c:"本会場",g:W,t:"女子 団体決勝（Team Final）"},
+ {s:"21:00",e:"21:15",c:"式典",g:W,t:"表彰式（団体）"}]},
+{d:"2026-09-24",open:"15:00",items:[
+ {s:"15:00",e:"16:15",c:"会議",g:M,t:"男子 審判会議・抽選（MTG & Draw）",m:"Press Conf. Room"},
+ {s:"16:00",e:"17:00",c:"会議",g:W,t:"女子 審判会議・抽選（MTG & Draw）",m:"Press Conf. Room"},
+ {s:"17:00",e:"17:40",c:"本会場",g:M,t:"男子 ゆか（FX）決勝"},
+ {s:"17:40",e:"17:55",c:"式典",g:M,t:"表彰式（ゆか FX）"},
+ {s:"17:55",e:"18:35",c:"本会場",g:W,t:"女子 跳馬（VT）決勝"},
+ {s:"18:35",e:"19:15",c:"本会場",g:M,t:"男子 あん馬（PH）決勝"},
+ {s:"19:15",e:"19:45",c:"式典",g:B,t:"表彰式（跳馬 VT・あん馬 PH）"},
+ {s:"19:45",e:"20:25",c:"本会場",g:W,t:"女子 段違い平行棒（UB）決勝"},
+ {s:"20:25",e:"21:05",c:"本会場",g:M,t:"男子 つり輪（SR）決勝"},
+ {s:"21:05",e:"21:35",c:"式典",g:B,t:"表彰式（段違い UB・つり輪 SR）"}]},
+{d:"2026-09-25",open:"13:30",items:[
+ {s:"13:30",e:"14:15",c:"会議",g:M,t:"男子 審判会議・抽選（MTG & Draw）",m:"Press Conf. Room"},
+ {s:"14:00",e:"15:00",c:"会議",g:W,t:"女子 審判会議・抽選（MTG & Draw）",m:"Press Conf. Room"},
+ {s:"15:00",e:"15:40",c:"本会場",g:M,t:"男子 跳馬（VT）決勝"},
+ {s:"15:40",e:"16:20",c:"本会場",g:W,t:"女子 平均台（BB）決勝"},
+ {s:"16:20",e:"16:50",c:"式典",g:B,t:"表彰式（跳馬 VT・平均台 BB）"},
+ {s:"16:50",e:"17:30",c:"本会場",g:M,t:"男子 平行棒（PB）決勝"},
+ {s:"17:30",e:"18:10",c:"本会場",g:W,t:"女子 ゆか（FX）決勝"},
+ {s:"18:10",e:"18:40",c:"式典",g:B,t:"表彰式（平行棒 PB・ゆか FX）"},
+ {s:"18:40",e:"19:20",c:"本会場",g:M,t:"男子 鉄棒（HB）決勝"},
+ {s:"19:20",e:"19:35",c:"式典",g:M,t:"表彰式（鉄棒 HB）"}]}
+];
+let SCHEDULE=SCHEDULE_DEFAULT;
+const MEET={title:"アジア競技大会2026 体操競技 TO日程",venue:"愛知・名古屋2026／会場表記はPDF準拠"};
 
-/* ---------- 時刻 ---------- */
-let fakeOffset=store.get('fakeOffset',0);
+/* ============ 時刻 ============ */
+let fakeOffset=0;
 const now=()=>new Date(Date.now()+fakeOffset);
 const WD=["日","月","火","水","木","金","土"];
-function p2(n){return String(n).padStart(2,'0');}
+const p2=n=>String(n).padStart(2,'0');
 const ymd=dt=>`${dt.getFullYear()}-${p2(dt.getMonth()+1)}-${p2(dt.getDate())}`;
 function evDate(day,hm){const[y,m,d]=day.split('-').map(Number);const[h,mi]=(hm||'00:00').split(':').map(Number);
   return new Date(y,m-1,d,h||0,mi||0,0,0);}
 function fmtCd(ms){const s=Math.max(0,Math.round(ms/1000));
   const h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60;
   return h?`${h}:${p2(m)}:${p2(ss)}`:`${m}:${p2(ss)}`;}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
 function tickClock(){
   const t=now();
   $('#clock').innerHTML=`${p2(t.getHours())}:${p2(t.getMinutes())}<span class="sec">${p2(t.getSeconds())}</span>`;
-  $('#eyebrow').textContent=MEET.title||'大会時程';
-  document.title=(MEET.title||'大会時程')+'｜時程';
+  $('#eyebrow').textContent=MEET.title;
+  document.title=MEET.title+'｜時程';
   $('#datebox').innerHTML=`<b>${t.getFullYear()}年${t.getMonth()+1}月${t.getDate()}日（${WD[t.getDay()]}）</b><br>
     <span class="note">${fakeOffset?'※仮の日時で表示中':(MEET.venue||'')}</span>`;
   const all=flat();
-  const base=MEET.start?new Date(MEET.start):(all[0]?all[0].st:null);
-  const last=all.length?all[all.length-1].et:null;
-  if(base&&t<base){
-    const diff=base-t,dys=Math.ceil(diff/86400000);
-    $('#dcount').innerHTML=`開始まで<br><span class="big">${dys}</span> 日`;
-  }else if(last&&t<=last){$('#dcount').innerHTML='<span class="big">開催中</span>';}
+  const first=all.length?all[0].st:null,last=all.length?all[all.length-1].et:null;
+  if(first&&t<first){$('#dcount').innerHTML=`開幕まで<br><span class="big">${Math.ceil((first-t)/86400000)}</span> 日`;}
+  else if(last&&t<=last){$('#dcount').innerHTML='<span class="big">大会中</span>';}
   else{$('#dcount').innerHTML='';}
 }
 
-/* ---------- 区分の色 ---------- */
-const PAL=['--c1','--c2','--c3','--c4','--c5'];
-let CATS=[];
-function refreshCats(){
-  CATS=[...new Set(flat().map(i=>i.cat).filter(c=>c&&!/共通|全体|運営/.test(c)))];
-}
-function catColor(cat){
-  if(!cat||/共通|全体|運営/.test(cat))return'var(--c0)';
-  const i=CATS.indexOf(cat);
-  return i<0?'var(--c0)':`var(${PAL[i%PAL.length]})`;
-}
-
-/* ---------- 時程ビュー ---------- */
+/* ============ ビュー ============ */
 let selDay=null;
 function flat(){const a=[];SCHEDULE.forEach(d=>d.items.forEach(it=>a.push({...it,day:d.d,
   st:evDate(d.d,it.s),et:evDate(d.d,it.e||it.s)})));return a.sort((x,y)=>x.st-y.st);}
 function statusOf(it,t){
-  if(!it.e||it.e===it.s)return t>=it.st?(t-it.st<45*60000?'live':'done'):'wait';
+  if(!it.e||it.e===it.s)return t>=it.st?(t-it.st<40*60000?'live':'done'):'wait';
   if(t>=it.et)return'done';if(t>=it.st)return'live';return'wait';}
+const gcls=g=>g==='男子'?'men':g==='女子'?'women':'both';
+const gbadge=g=>g==='男子'?'b-men':g==='女子'?'b-women':'b-both';
 
+/* --- データに実在するカテゴリ／区分だけを自動検出 ---
+   サブが無い大会は c:"サブ" の行が0件になるので、サブタブ・サブのナウボードは自動的に出ない。
+   本会場やサブが男女どちらか一方のデータしか無ければ、その区分は自動で1列表示になる。 */
+const CATS_PRESENT=[...new Set(SCHEDULE.flatMap(d=>d.items).map(i=>i.c))];
+function gendersIn(cat){
+  return [...new Set(SCHEDULE.flatMap(d=>d.items).filter(i=>i.c===cat&&i.g!=='共通').map(i=>i.g))];
+}
+
+/* --- ナウボード：本会場／サブは男女データが揃っていれば分割、無ければ単一。今やっていること＋次 --- */
+const BOARD_CELLS=['本会場','サブ'].filter(c=>CATS_PRESENT.includes(c)).flatMap(c=>{
+  const gs=gendersIn(c);
+  if(gs.length>=2)return[{key:c+'-男子',label:c+'・男子',c,g:'男子'},{key:c+'-女子',label:c+'・女子',c,g:'女子'}];
+  return[{key:c,label:c,c,g:null}];
+});
+function renderBoard(){
+  const t=now(),all=flat(),box=$('#board');box.innerHTML='';
+  BOARD_CELLS.forEach(({label,c,g})=>{
+    const inCell=i=>i.c===c&&(!g||i.g===g);
+    const lives=all.filter(i=>inCell(i)&&statusOf(i,t)==='live'&&i.e&&i.e!==i.s);
+    const next=all.find(i=>inCell(i)&&i.st>t);
+    const gtag=i=>g?'':`<span class="badge ${gbadge(i.g)}">${i.g}</span> `;
+    const cell=document.createElement('div');
+    if(lives.length){
+      cell.className='bcell live';
+      cell.innerHTML=`<div class="lbl"><span>${label}</span><span class="st">NOW</span></div>`+
+        lives.map(i=>`<div class="ttl">${gtag(i)}${esc(i.t)}
+          <span class="sub num">${i.s}–${i.e}（残り <span class="cd">${fmtCd(i.et-t)}</span>）</span></div>`).join('')+
+        (next?`<div class="sub" style="margin-top:4px">次 ${next.s} ${gtag(next)}${esc(next.t)}</div>`:'');
+    }else if(next){
+      cell.className='bcell';
+      const dd=next.st-t,dys=Math.floor(dd/86400000);
+      cell.innerHTML=`<div class="lbl"><span>${label}</span><span>NEXT</span></div>
+        <div class="ttl">${gtag(next)}${esc(next.t)}</div>
+        <div class="sub num">${next.day.slice(5).replace('-','/')} ${next.s} 開始（あと ${dys>0?dys+'日 ':''}${fmtCd(dd%86400000)}）</div>`;
+    }else{
+      cell.className='bcell idle';
+      cell.innerHTML=`<div class="lbl"><span>${label}</span></div><div class="ttl">予定はすべて終了しました</div>`;
+    }
+    box.appendChild(cell);});
+  /* 会議・式典は直近があるときだけ出す */
+  ["会議","式典"].forEach(cat=>{
+    const lives=all.filter(i=>i.c===cat&&statusOf(i,t)==='live');
+    const next=all.find(i=>i.c===cat&&i.st>t&&i.st-t<24*3600000);
+    if(!lives.length&&!next)return;
+    const cell=document.createElement('div');
+    const i=lives[0]||next;
+    cell.className='bcell'+(lives.length?' live':'');
+    cell.innerHTML=`<div class="lbl"><span>${cat}</span><span class="${lives.length?'st':''}">${lives.length?'NOW':'NEXT'}</span></div>
+      <div class="ttl">${esc(i.t)}</div>
+      <div class="sub num">${i.day.slice(5).replace('-','/')} ${i.s}${i.e&&i.e!==i.s?'–'+i.e:''}
+      ${!lives.length?`（あと ${fmtCd(i.st-t)}）`:''}</div>`;
+    box.appendChild(cell);});
+}
+
+/* --- タブ：実データがあるカテゴリだけ、本会場→サブ→会議→式典の順で出す --- */
+const FILTERS=['本会場','サブ','会議','式典'].filter(c=>CATS_PRESENT.includes(c)).map(key=>({key,label:key}));
+let selCat=store.get('cat',null);
+if(!FILTERS.some(f=>f.key===selCat))selCat=(FILTERS[0]||{key:'本会場'}).key;
+function renderFilters(){
+  const box=$('#filters');box.innerHTML='';
+  FILTERS.forEach(({key,label})=>{
+    const b=document.createElement('button');b.className='fchip';
+    b.setAttribute('aria-pressed',String(key===selCat));b.textContent=label;
+    b.onclick=()=>{selCat=key;store.set('cat',key);renderFilters();renderRail();};
+    box.appendChild(b);});
+}
 function renderDays(){
   const box=$('#daychips');box.innerHTML='';const t=now();
   SCHEDULE.forEach(d=>{
     const[y,m,dd]=d.d.split('-').map(Number),dt=new Date(y,m-1,dd);
     const b=document.createElement('button');b.className='chip';
     b.setAttribute('aria-pressed',String(d.d===selDay));
-    const isToday=ymd(t)===d.d;
-    b.innerHTML=`${m}/${dd}${isToday?'<span class="dot"></span>':''}<small>${WD[dt.getDay()]}曜</small>`;
+    b.innerHTML=`${m}/${dd}${ymd(t)===d.d?'<span class="dot"></span>':''}<small>${WD[dt.getDay()]}曜</small>`;
     b.onclick=()=>{selDay=d.d;renderDays();renderRail();};
     box.appendChild(b);});
 }
-function renderRail(){
-  const t=now(),rail=$('#rail');rail.innerHTML='';refreshCats();
-  const items=flat().filter(i=>i.day===selDay);
-  if(!items.length){rail.innerHTML='<p class="note">この日の項目はありません。設定タブで追加できます。</p>';return;}
+
+/* --- 本会場／サブ：男女2列表示 --- */
+function renderColEvents(container,items,t){
+  container.innerHTML='';
+  if(!items.length){container.innerHTML='<p class="note" style="font-size:11.5px">予定なし</p>';return;}
+  let lineDone=false;
+  const firstWait=items.findIndex(i=>statusOf(i,t)==='wait');
+  items.forEach((it,idx)=>{
+    const st=statusOf(it,t);
+    if(!lineDone&&st==='wait'&&ymd(t)===selDay){
+      const nl=document.createElement('div');nl.className='colnow';
+      nl.textContent=`${p2(t.getHours())}:${p2(t.getMinutes())} 現在`;container.appendChild(nl);lineDone=true;}
+    const cls=st==='done'?'done':st==='live'?'live':(idx===firstWait?'next':'');
+    const el=document.createElement('div');
+    el.className=`cev ${gcls(it.g)} ${cls}${it.k?' chk':''}`;
+    el.innerHTML=`
+      <div class="ct num">${it.s}${it.e&&it.e!==it.s?'–'+it.e:''}</div>
+      <h4>${esc(it.t)}</h4>
+      <div class="cmeta">
+        ${it.k?'<span class="badge b-check">要確認</span>':''}
+        ${st==='live'?'<span class="badge b-live">進行中</span>':''}
+        ${st==='live'&&it.e&&it.e!==it.s?`<span class="num cdrem" style="color:var(--live)">残り ${fmtCd(it.et-t)}</span>`:''}
+      </div>`;
+    container.appendChild(el);});
+}
+function renderTwoCol(container,items,t){
+  const common=items.filter(i=>i.g==='共通');
+  const men=items.filter(i=>i.g==='男子');
+  const women=items.filter(i=>i.g==='女子');
+  if(common.length){
+    const bar=document.createElement('div');bar.className='common-bar';
+    common.forEach(it=>{
+      const chip=document.createElement('div');
+      chip.className='common-chip'+(statusOf(it,t)==='live'?' live':'');
+      chip.innerHTML=`<span class="num">${it.s}</span><span>${esc(it.t)}</span>`;
+      bar.appendChild(chip);});
+    container.appendChild(bar);
+  }
+  const cols=document.createElement('div');cols.className='cols';
+  const mCol=document.createElement('div');
+  mCol.innerHTML='<div class="col-head men"><span class="dot"></span>男子</div>';
+  const mList=document.createElement('div');mList.className='colrail';mCol.appendChild(mList);
+  const wCol=document.createElement('div');
+  wCol.innerHTML='<div class="col-head women"><span class="dot"></span>女子</div>';
+  const wList=document.createElement('div');wList.className='colrail';wCol.appendChild(wList);
+  cols.appendChild(mCol);cols.appendChild(wCol);
+  container.appendChild(cols);
+  renderColEvents(mList,men,t);
+  renderColEvents(wList,women,t);
+}
+
+/* --- 会議／式典：単一列表示 --- */
+function renderSingleCol(container,items,t){
+  const wrap=document.createElement('div');wrap.className='rail';
   let lineDone=false;
   const firstWait=items.findIndex(i=>statusOf(i,t)==='wait');
   items.forEach((it,idx)=>{
     const st=statusOf(it,t);
     if(!lineDone&&st==='wait'&&ymd(t)===selDay){
       const nl=document.createElement('div');nl.className='nowline';
-      nl.innerHTML=`<span>${p2(t.getHours())}:${p2(t.getMinutes())} 現在</span>`;rail.appendChild(nl);lineDone=true;}
+      nl.innerHTML=`<span>${p2(t.getHours())}:${p2(t.getMinutes())} 現在</span>`;wrap.appendChild(nl);lineDone=true;}
     const cls=st==='done'?'done':st==='live'?'live':(idx===firstWait?'next':'');
     const el=document.createElement('div');
-    el.className=`ev ${cls}${it.check?' check':''}`;
-    const key='chk:'+it.day+it.s+(it.title||'')+(it.cat||'');
-    const done=store.get(key,false);
+    el.className=`ev ${gcls(it.g)} ${cls}${it.k?' chk':''}`;
     el.innerHTML=`
       <div class="t num">${it.s}<small>${it.e&&it.e!==it.s?'▼ '+it.e:''}</small></div>
-      <h3>${esc(it.title||'')}</h3>
+      <h3>${esc(it.t)}</h3>
       <div class="meta">
-        ${it.cat?`<span class="badge" style="color:${catColor(it.cat)}">${esc(it.cat)}</span>`:''}
-        ${it.check?'<span class="badge b-check">時刻 要確認</span>':''}
+        <span class="badge ${gbadge(it.g)}">${it.g}</span>
+        ${it.k?'<span class="badge b-check">時刻 要確認</span>':''}
         ${st==='live'?'<span class="badge b-live">進行中</span>':''}
-      </div>
-      ${it.memo?`<div class="memo">${esc(it.memo)}</div>`:''}
-      ${it.issue?`<div class="issue">${esc(MEET.issueLabel||'要チェック')} <b>${it.issue}</b>
-        <span class="cdslot num" data-issue="${it.issue}"></span>
-        <label class="chk"><input type="checkbox" ${done?'checked':''}> 完了</label></div>`:''}`;
-    const cb=el.querySelector('.chk input');
-    if(cb)cb.onchange=()=>store.set(key,cb.checked);
-    rail.appendChild(el);});
-  refreshLive();
+        ${st==='live'&&it.e&&it.e!==it.s?`<span class="num cdrem" style="color:var(--live)">残り ${fmtCd(it.et-t)}</span>`:''}
+        ${it.m?`<span>${esc(it.m)}</span>`:''}
+      </div>`;
+    wrap.appendChild(el);});
+  container.appendChild(wrap);
 }
-function refreshLive(){
-  const t=now();
-  $$('#rail .cdslot').forEach(sp=>{
-    const target=evDate(selDay,sp.dataset.issue),d=target-t;
-    sp.textContent=d>0&&d<6*3600000?`（あと ${fmtCd(d)}）`:'';
-    sp.style.color=d>0&&d<15*60000?'var(--live)':'var(--ink3)';});
-  renderNowCard();
-}
-function renderNowCard(){
-  const t=now(),all=flat();
-  const live=all.filter(i=>statusOf(i,t)==='live'),next=all.find(i=>i.st>t),box=$('#nowcard');
-  if(live.length){
-    const i=live[0];
-    box.innerHTML=`<div class="nowcard"><div class="lbl">NOW / 進行中</div>
-      <div class="ttl">${esc(i.cat||'')}　${esc(i.title||'')}</div>
-      <div class="cd">${i.e&&i.e!==i.s?'残り '+fmtCd(i.et-t):'—'}</div>
-      <div class="sub">${i.s}${i.e&&i.e!==i.s?'–'+i.e:''}${i.issue?`　／　${esc(MEET.issueLabel||'要チェック')} ${i.issue}`:''}</div></div>`;
-  }else if(next){
-    const dd=next.st-t,dys=Math.floor(dd/86400000);
-    box.innerHTML=`<div class="nowcard"><div class="lbl">NEXT / 次の予定</div>
-      <div class="ttl">${esc(next.cat||'')}　${esc(next.title||'')}</div>
-      <div class="cd">${dys>0?dys+' 日 '+fmtCd(dd%86400000):fmtCd(dd)}</div>
-      <div class="sub">${next.day.slice(5).replace('-','/')} ${next.s} 開始</div></div>`;
-  }else{box.innerHTML='';}
+
+function renderRail(){
+  const t=now(),rail=$('#rail');rail.innerHTML='';
+  const items=flat().filter(i=>i.day===selDay&&i.c===selCat);
+  if(!items.length){
+    rail.innerHTML=`<p class="note">${selCat==='会議'?'会議の予定は未登録です。':'この日の項目はありません。'}</p>`;return;}
+  const isVenue=(selCat==='本会場'||selCat==='サブ');
+  if(isVenue&&gendersIn(selCat).length>=2){renderTwoCol(rail,items,t);}
+  else{renderSingleCol(rail,items,t);}
 }
 function checkWarn(){
-  const n=flat().filter(i=>i.check).length;
-  $('#checkWarn').innerHTML=n?`<div class="warnbar">時刻が未確認の項目が ${n} 件あります。原本と照合してください。</div>`:'';
-}
-function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
-
-/* ---------- 編集 ---------- */
-let edDayIdx=0;
-function fillDaySelect(){
-  const sel=$('#edDay');sel.innerHTML='';
-  SCHEDULE.forEach((d,i)=>{const[y,m,dd]=d.d.split('-').map(Number);
-    sel.insertAdjacentHTML('beforeend',
-      `<option value="${i}" ${i===edDayIdx?'selected':''}>${y}/${m}/${dd}（${WD[new Date(y,m-1,dd).getDay()]}）${d.items.length}件</option>`);});
-}
-function renderEdit(){
-  fillDaySelect();
-  const box=$('#edRows');box.innerHTML='';
-  const day=SCHEDULE[edDayIdx];
-  if(!day){box.innerHTML='<p class="note">日がありません。「日を追加」を押してください。</p>';return;}
-  day.items.forEach((it,i)=>{
-    const r=document.createElement('div');r.className='editrow';
-    r.innerHTML=`
-      <input type="time" value="${it.s||''}" data-k="s">
-      <input type="time" value="${it.e||''}" data-k="e">
-      <input type="text" value="${esc(it.cat||'')}" data-k="cat" placeholder="区分">
-      <input type="text" class="wide" value="${esc(it.title||'')}" data-k="title" placeholder="内容">
-      <input type="time" value="${it.issue||''}" data-k="issue">
-      <button class="del" title="削除">×</button>`;
-    r.querySelectorAll('[data-k]').forEach(inp=>inp.oninput=()=>{it[inp.dataset.k]=inp.value;});
-    r.querySelector('.del').onclick=()=>{day.items.splice(i,1);renderEdit();};
-    box.appendChild(r);});
-}
-function commit(){
-  SCHEDULE.forEach(d=>d.items=d.items.filter(i=>i.s||i.title));
-  SCHEDULE.forEach(d=>d.items.sort((a,b)=>(a.s||'').localeCompare(b.s||'')));
-  SCHEDULE.sort((a,b)=>a.d.localeCompare(b.d));
-  store.set('sched',SCHEDULE);initSchedule();renderEdit();
+  const n=flat().filter(i=>i.k).length;
+  $('#checkWarn').innerHTML=n?`<div class="warnbar">時刻が未確定の項目が ${n} 件あります（点線の枠）。</div>`:'';
 }
 
-/* ---------- まとめて入力 ---------- */
-function bulkToText(){
-  return SCHEDULE.flatMap(d=>d.items.map((it,i)=>
-    [i===0?d.d:'',it.s||'',it.e||'',it.cat||'',it.title||'',it.issue||'',it.memo||''].join(','))).join('\n');
-}
-function bulkParse(txt){
-  const out=[];let cur=null,lastDay='';
-  txt.split(/\r?\n/).forEach(line=>{
-    if(!line.trim())return;
-    const c=line.split(',').map(s=>s.trim());
-    let day=c[0];
-    if(day){day=day.replace(/[\/年月]/g,'-').replace(/日/,'');
-      const m=day.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
-      if(m)day=`${m[1]}-${p2(+m[2])}-${p2(+m[3])}`;else day='';}
-    if(!day)day=lastDay;
-    if(!day)return;
-    lastDay=day;
-    if(!cur||cur.d!==day){cur=out.find(o=>o.d===day);if(!cur){cur={d:day,items:[]};out.push(cur);}}
-    const hm=v=>{const m=(v||'').match(/(\d{1,2})[:：](\d{2})/);return m?`${p2(+m[1])}:${m[2]}`:'';};
-    cur.items.push({s:hm(c[1]),e:hm(c[2]),cat:c[3]||'',title:c[4]||'',issue:hm(c[5]),memo:c[6]||''});});
-  return out;
-}
-
-/* ---------- 出力 ---------- */
-function dl(blob,name){const u=URL.createObjectURL(blob),a=document.createElement('a');
-  a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),4000);}
-function bundle(){return{meet:MEET,schedule:SCHEDULE,version:1};}
-
-/* ---------- 画面 ---------- */
-$$('.tab').forEach(t=>t.onclick=()=>{
-  $$('.tab').forEach(x=>x.setAttribute('aria-selected',String(x===t)));
-  $$('.view').forEach(v=>v.classList.toggle('on',v.id==='view-'+t.dataset.view));
-  if(t.dataset.view==='settings')renderEdit();
-  window.scrollTo({top:0});});
+/* ============ 画面 ============ */
 $('#themeBtn').onclick=()=>{const d=document.documentElement;
   const v=d.dataset.theme==='dark'?'light':'dark';d.dataset.theme=v;
-  try{localStorage.setItem('theme',v);}catch(e){}};
-try{document.documentElement.dataset.theme=localStorage.getItem('theme')||'dark';}catch(e){}
+  try{localStorage.setItem(NS+':theme',JSON.stringify(v));}catch(e){}};
+document.documentElement.dataset.theme=store.get('theme','dark');
 
-$('#edDay').onchange=e=>{edDayIdx=+e.target.value;renderEdit();};
-$('#addDay').onclick=()=>{
-  const last=SCHEDULE.length?SCHEDULE[SCHEDULE.length-1].d:ymd(now());
-  const d=new Date(evDate(last,'00:00').getTime()+86400000);
-  SCHEDULE.push({d:ymd(d),items:[]});edDayIdx=SCHEDULE.length-1;commit();};
-$('#delDay').onclick=()=>{if(!SCHEDULE.length)return;
-  if(!confirm(SCHEDULE[edDayIdx].d+' を削除します。よろしいですか。'))return;
-  SCHEDULE.splice(edDayIdx,1);edDayIdx=Math.max(0,edDayIdx-1);commit();toast('削除しました');};
-$('#addRow').onclick=()=>{if(!SCHEDULE.length)SCHEDULE.push({d:ymd(now()),items:[]});
-  SCHEDULE[edDayIdx].items.push({s:'',e:'',cat:'',title:'',issue:'',memo:''});renderEdit();};
-$('#saveRows').onclick=()=>{commit();toast('保存しました');};
-
-$('#bulkLoad').onclick=()=>{$('#bulk').value=bulkToText();toast('読み込みました');};
-$('#bulkApply').onclick=()=>{
-  const v=bulkParse($('#bulk').value);
-  if(!v.length){toast('読み取れる行がありません');return;}
-  if(!confirm('現在の時程をこの内容で置き換えます。よろしいですか。'))return;
-  SCHEDULE=v;edDayIdx=0;commit();toast(`${v.reduce((n,d)=>n+d.items.length,0)} 件に置き換えました`);};
-
-$('#expJson').onclick=()=>dl(new Blob([JSON.stringify(bundle(),null,1)],{type:'application/json'}),
-  `${(MEET.title||'大会').replace(/[\/\\:*?"<>|]/g,'')}_時程.json`);
-$('#impJson').onclick=()=>$('#impFile').click();
-$('#impFile').onchange=e=>{const f=e.target.files[0];if(!f)return;
-  const fr=new FileReader();fr.onload=()=>{try{
-    const j=JSON.parse(fr.result);
-    const sch=j.schedule||j;
-    if(!Array.isArray(sch))throw 0;
-    SCHEDULE=sch;if(j.meet)MEET=Object.assign(MEET,j.meet);
-    store.set('meet',MEET);edDayIdx=0;commit();syncFields();toast('読み込みました');
-  }catch(err){toast('このファイルは読み込めません');}};
-  fr.readAsText(f);e.target.value='';};
-$('#expCsv').onclick=()=>{
-  const esc2=v=>/[",\n]/.test(String(v))?`"${String(v).replace(/"/g,'""')}"`:String(v);
-  const rows=[['日付','開始','終了','区分','内容','要チェック時刻','備考'],
-    ...SCHEDULE.flatMap(d=>d.items.map(i=>[d.d,i.s||'',i.e||'',i.cat||'',i.title||'',i.issue||'',i.memo||'']))];
-  dl(new Blob(['\uFEFF'+rows.map(r=>r.map(esc2).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}),
-    `${(MEET.title||'大会').replace(/[\/\\:*?"<>|]/g,'')}_時程.csv`);};
-$('#clearChk').onclick=()=>{if(!confirm('チェックを全部外します。よろしいですか。'))return;
-  store.keys().filter(k=>k.startsWith(NS+':chk:')).forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});
-  renderRail();toast('外しました');};
-$('#resetAll').onclick=()=>{if(!confirm('時程・大会情報・チェックをすべて消して初期状態に戻します。'))return;
-  store.keys().filter(k=>k.startsWith(NS+':')).forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});
-  SCHEDULE=sample();MEET={title:"2026 西日本ジュニア体操競技選手権大会",venue:"内村記念アリーナ",start:"2026-07-22T13:00",key:NS};
-  edDayIdx=0;commit();syncFields();toast('初期状態に戻しました');};
-
-$('#fakeApply').onclick=()=>{const v=$('#sFakeNow').value;if(!v)return;
-  fakeOffset=new Date(v)-new Date();store.set('fakeOffset',fakeOffset);initSchedule();toast('仮の日時で表示します');};
-$('#fakeClear').onclick=()=>{fakeOffset=0;store.set('fakeOffset',0);initSchedule();toast('実時刻に戻しました');};
-
-['sTitle','sVenue','sStart'].forEach(id=>{
-  const k={sTitle:'title',sVenue:'venue',sStart:'start'}[id];
-  $('#'+id).oninput=e=>{MEET[k]=e.target.value;store.set('meet',MEET);tickClock();};});
-$('#sKey').onchange=e=>{
-  const v=(e.target.value||'meet').replace(/[^\w\-]/g,'')||'meet';
-  if(v===NS)return;
-  NS=v;writeNS(NS);
-  MEET=Object.assign({title:"大会時程",venue:"",start:"",key:NS},store.get('meet',{}));
-  SCHEDULE=store.get('sched',null)||sample();
-  fakeOffset=store.get('fakeOffset',0);
-  edDayIdx=0;commit();syncFields();toast('保存キーを切り替えました：'+NS);};
-function syncFields(){
-  $('#sTitle').value=MEET.title||'';$('#sVenue').value=MEET.venue||'';
-  $('#sStart').value=MEET.start||'';$('#sKey').value=NS;}
-
-function initSchedule(){
+function init(){
   const t=now(),td=ymd(t);
-  if(!SCHEDULE.length){selDay=null;$('#rail').innerHTML='<p class="note">時程がありません。設定タブで追加してください。</p>';
-    $('#daychips').innerHTML='';$('#nowcard').innerHTML='';checkWarn();tickClock();return;}
   selDay=SCHEDULE.some(d=>d.d===td)?td:(SCHEDULE.find(d=>d.d>=td)||SCHEDULE[SCHEDULE.length-1]).d;
-  checkWarn();renderDays();renderRail();tickClock();}
-
-setInterval(()=>{tickClock();if(selDay)refreshLive();},1000);
-syncFields();initSchedule();renderEdit();
+  checkWarn();renderBoard();renderFilters();renderDays();renderRail();tickClock();}
+setInterval(()=>{tickClock();renderBoard();
+  const t=now();
+  $$('#rail .cdrem').length&&renderRail();},1000);
+init();
 </script>
 </body>
 </html>
