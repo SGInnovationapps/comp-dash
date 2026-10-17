@@ -4,19 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#10151d">
-<title>アジア競技大会2026 体操競技 TO日程</title>
+<title>世界体操2026 ロッテルダム（日本時間）</title>
 <style>
 /* ============================================================
-   大会リアルタイム時程 テンプレート
-   男子=紺 / 女子=赤。新しい大会を作るときは：
-   1) <title> と MEET（title/venue）を書き換える
-   2) SCHEDULE_DEFAULT を差し替える（書式はコメント参照）
-   3) タブ（本会場／サブ／会議／式典）とナウボードは、実際に
-      データが存在するカテゴリだけを自動判定して表示する。
-      サブが無い大会ならサブタブは自動的に出ない。
-   4) 本会場／サブの列は、男女どちらのデータもあれば2列、
-      片方しか無ければ自動的に1列表示になる。
-   男子=紺 / 女子=赤（原本の日程表の配色に合わせる）
+   大会リアルタイム時程 — 世界体操2026 ロッテルダム（日本時間表示）
+   男子=紺 / 女子=赤。
+   このファイルはテンプレートに次の3点を追加している：
+   1) 日またぎ対応（終了が開始より前なら翌日扱い。「翌」表示）
+   2) 出場国の国旗つき表示（m フィールドをカードに表示）
+   3) ライトモードのチップ文字色をテーマ連動に修正
    ============================================================ */
 :root{
   --bg:#10151d; --bg2:#0b1017; --panel:#182031; --panel2:#1f2a3d;
@@ -79,6 +75,7 @@ main{max-width:1100px;margin:0 auto;padding:14px 12px 90px}
 .bcell .ttl{font-size:15.5px;font-weight:700;margin:4px 0 1px;line-height:1.35}
 .bcell .sub{font-size:12px;color:var(--ink2)}
 .bcell .cd{font-family:var(--font-num);font-size:13px;color:var(--live)}
+.bcell .bteams{font-size:11.5px;color:var(--ink2);margin-top:4px;line-height:1.5;font-weight:400;word-break:break-word}
 .bcell.idle .ttl{color:var(--ink3);font-weight:600;font-size:13.5px}
 
 .filters{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:8px}
@@ -137,6 +134,7 @@ main{max-width:1100px;margin:0 auto;padding:14px 12px 90px}
 .cev.chk{border-style:dashed;border-left-style:solid}
 .cev .ct{font-family:var(--font-num);font-size:11.5px;color:var(--ink2)}
 .cev h4{font-size:12.5px;margin:2px 0 0;font-weight:700;line-height:1.3}
+.cev .cteams{font-size:11px;color:var(--ink2);margin-top:3px;line-height:1.55;word-break:break-word}
 .cev .cmeta{font-size:10px;color:var(--ink2);margin-top:3px;display:flex;gap:5px;flex-wrap:wrap;align-items:center}
 .colnow{font-size:10.5px;color:var(--live);font-weight:700;text-align:center;
   padding:2px 0;border-top:1px dashed var(--live);border-bottom:1px dashed var(--live);margin:2px 0}
@@ -144,6 +142,7 @@ main{max-width:1100px;margin:0 auto;padding:14px 12px 90px}
   .cols{gap:6px}
   .cev{padding:6px 7px}
   .cev h4{font-size:11.5px}
+  .cev .cteams{font-size:10.5px}
 }
 
 @media (max-width:640px){
@@ -162,7 +161,7 @@ main{max-width:1100px;margin:0 auto;padding:14px 12px 90px}
 <header class="topbar">
   <div class="tb-row">
     <div>
-      <div class="eyebrow" id="eyebrow">アジア競技大会2026 体操競技 TO日程</div>
+      <div class="eyebrow" id="eyebrow">世界体操2026 ロッテルダム（日本時間）</div>
       <div class="clock num" id="clock">--:--<span class="sec">--</span></div>
     </div>
     <div class="datebox" id="datebox">—</div>
@@ -179,13 +178,13 @@ main{max-width:1100px;margin:0 auto;padding:14px 12px 90px}
   <div class="filters" id="filters"></div>
   <div class="daychips" id="daychips"></div>
   <div id="rail"></div>
-  <p class="note noprint">「第○班」＝Subdivision（競技班）／FOP＝主競技場。会場表記はPDF原本に準拠。開会式の時刻は原本に記載がなく未定（要確認）。</p>
+  <p class="note noprint">表示はすべて日本時間（JST）。現地ロッテルダムとの時差は10/24まで7時間、10/25（現地が標準時へ移行）以降は8時間。「翌」は日本時間で日付をまたぐ枠。各班の国名は予選の出場国（個人選手は略）。※端末の時計が日本時間である前提で「現在／残り」を計算します。</p>
 </section>
 </main>
 
 <script>
 /* ============ 保存 ============ */
-const NS='ag2026gar';
+const NS='worlds2026rot';
 const store=(()=>{let mem={},ok=true;
   try{localStorage.setItem('__t','1');localStorage.removeItem('__t');}catch(e){ok=false;}
   return{
@@ -196,79 +195,48 @@ const store=(()=>{let mem={},ok=true;
   };})();
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 
-/* ============ 時程データ ============
-   新しい大会用に、この SCHEDULE_DEFAULT と MEET を丸ごと差し替える。
-
-   1件のフォーマット: {s:開始, e:終了(単発なら""), c:カテゴリ, g:区分, t:内容, m:備考(省略可), k:1(時刻未確定なら)}
-   c（カテゴリ）: "本会場" / "サブ" / "会議"（審判会議・リーダー会議など）/ "式典"（開会式・表彰式など）
-     - 実際にデータが存在するカテゴリだけ、タブとナウボードに自動で出る。
-       サブが無い大会なら c:"サブ" の行を1件も書かなければサブタブは出ない。
-   g（区分）: "男子" / "女子" / "共通"
-     - 本会場・サブの列は、男女どちらのデータもあれば2列、片方しか無ければ自動で1列になる。
-     - g:"共通" は開館・受付・退館など男女に関係ない項目（2列表示の上に横バーで出る）。
-   時刻は "HH:MM"（24時間表記）。日をまたぐ大会は d を "YYYY-MM-DD" で分けて配列に足す。 */
+/* ============ 時程データ（日本時間 JST）============
+   1件: {s:開始, e:終了(単発なら""), c:カテゴリ, g:区分, t:内容, m:備考/出場国(省略可), k:1(時刻未確定なら)}
+   - 終了が開始より前の枠（例 23:00→00:50）は日本時間で日付をまたぐ＝翌日扱い（自動で「翌」表示）。
+   - m に出場国（国旗絵文字つき）を入れるとカードに表示される。 */
 const M='男子',W='女子',B='共通';
 const SCHEDULE_DEFAULT=[
-{d:"2026-09-16",open:"10:00",items:[
- {s:"10:00",e:"12:00",c:"会議",g:M,t:"男子 技術委員会（TC）会議",m:"TD Room"}]},
-{d:"2026-09-17",open:"13:00",items:[
- {s:"13:00",e:"18:00",c:"会議",g:W,t:"女子 技術委員会（TC）会議",m:"TD Room"},
- {s:"15:00",e:"18:00",c:"会議",g:M,t:"男子 審判説明・抽選（Instruction & Draw）",m:"Press Conf. Room"}]},
-{d:"2026-09-18",open:"9:00",items:[
- {s:"09:00",e:"09:30",c:"会議",g:M,t:"男子 審判会議（Briefing）",m:"Press Conf. Room"},
- {s:"10:00",e:"12:30",c:"本会場",g:M,t:"男子 公式練習（ポディウム）第1班"},
- {s:"14:30",e:"17:00",c:"本会場",g:M,t:"男子 公式練習（ポディウム）第2班"},
- {s:"15:00",e:"18:00",c:"会議",g:W,t:"女子 審判説明・抽選（Instruction & Draw）",m:"Press Conf. Room"}]},
-{d:"2026-09-19",open:"",items:[
- {s:"",e:"",c:"式典",g:B,t:"開会式（Opening Ceremony）",k:1,m:"時刻未定"}]},
-{d:"2026-09-20",open:"11:00",items:[
- {s:"11:00",e:"12:00",c:"会議",g:W,t:"女子 審判会議（Briefing）",m:"Press Conf. Room"},
- {s:"12:00",e:"13:40",c:"本会場",g:W,t:"女子 公式練習（ポディウム）第1班"},
- {s:"14:00",e:"15:40",c:"本会場",g:W,t:"女子 公式練習（ポディウム）第2班"},
- {s:"17:30",e:"19:10",c:"本会場",g:W,t:"女子 公式練習（ポディウム）第3班"}]},
-{d:"2026-09-21",open:"9:00",items:[
- {s:"09:00",e:"09:30",c:"会議",g:M,t:"男子 審判会議（Briefing）",m:"Press Conf. Room"},
- {s:"10:00",e:"12:30",c:"本会場",g:M,t:"男子 予選・個人総合 第1班"},
- {s:"14:30",e:"17:00",c:"本会場",g:M,t:"男子 予選・個人総合 第2班"},
- {s:"17:00",e:"17:15",c:"式典",g:M,t:"表彰式（Victory Ceremony）"}]},
-{d:"2026-09-22",open:"10:15",items:[
- {s:"10:15",e:"11:30",c:"会議",g:W,t:"女子 審判会議（Briefing）",m:"Press Conf. Room"},
- {s:"12:00",e:"13:40",c:"本会場",g:W,t:"女子 予選・個人総合 第1班"},
- {s:"14:00",e:"15:40",c:"本会場",g:W,t:"女子 予選・個人総合 第2班"},
- {s:"17:30",e:"19:10",c:"本会場",g:W,t:"女子 予選・個人総合 第3班"},
- {s:"19:10",e:"19:25",c:"式典",g:W,t:"表彰式（Victory Ceremony）"}]},
-{d:"2026-09-23",open:"11:30",items:[
- {s:"11:30",e:"12:00",c:"会議",g:M,t:"男子 審判会議・抽選（MTG & Draw）",m:"Press Conf. Room"},
- {s:"13:00",e:"15:30",c:"本会場",g:M,t:"男子 団体決勝（Team Final）"},
- {s:"15:30",e:"15:55",c:"式典",g:M,t:"表彰式（団体）"},
- {s:"17:30",e:"18:30",c:"会議",g:W,t:"女子 審判会議・抽選（MTG & Draw）",m:"Press Conf. Room"},
- {s:"19:00",e:"21:00",c:"本会場",g:W,t:"女子 団体決勝（Team Final）"},
- {s:"21:00",e:"21:15",c:"式典",g:W,t:"表彰式（団体）"}]},
-{d:"2026-09-24",open:"15:00",items:[
- {s:"15:00",e:"16:15",c:"会議",g:M,t:"男子 審判会議・抽選（MTG & Draw）",m:"Press Conf. Room"},
- {s:"16:00",e:"17:00",c:"会議",g:W,t:"女子 審判会議・抽選（MTG & Draw）",m:"Press Conf. Room"},
- {s:"17:00",e:"17:40",c:"本会場",g:M,t:"男子 ゆか（FX）決勝"},
- {s:"17:40",e:"17:55",c:"式典",g:M,t:"表彰式（ゆか FX）"},
- {s:"17:55",e:"18:35",c:"本会場",g:W,t:"女子 跳馬（VT）決勝"},
- {s:"18:35",e:"19:15",c:"本会場",g:M,t:"男子 あん馬（PH）決勝"},
- {s:"19:15",e:"19:45",c:"式典",g:B,t:"表彰式（跳馬 VT・あん馬 PH）"},
- {s:"19:45",e:"20:25",c:"本会場",g:W,t:"女子 段違い平行棒（UB）決勝"},
- {s:"20:25",e:"21:05",c:"本会場",g:M,t:"男子 つり輪（SR）決勝"},
- {s:"21:05",e:"21:35",c:"式典",g:B,t:"表彰式（段違い UB・つり輪 SR）"}]},
-{d:"2026-09-25",open:"13:30",items:[
- {s:"13:30",e:"14:15",c:"会議",g:M,t:"男子 審判会議・抽選（MTG & Draw）",m:"Press Conf. Room"},
- {s:"14:00",e:"15:00",c:"会議",g:W,t:"女子 審判会議・抽選（MTG & Draw）",m:"Press Conf. Room"},
- {s:"15:00",e:"15:40",c:"本会場",g:M,t:"男子 跳馬（VT）決勝"},
- {s:"15:40",e:"16:20",c:"本会場",g:W,t:"女子 平均台（BB）決勝"},
- {s:"16:20",e:"16:50",c:"式典",g:B,t:"表彰式（跳馬 VT・平均台 BB）"},
- {s:"16:50",e:"17:30",c:"本会場",g:M,t:"男子 平行棒（PB）決勝"},
- {s:"17:30",e:"18:10",c:"本会場",g:W,t:"女子 ゆか（FX）決勝"},
- {s:"18:10",e:"18:40",c:"式典",g:B,t:"表彰式（平行棒 PB・ゆか FX）"},
- {s:"18:40",e:"19:20",c:"本会場",g:M,t:"男子 鉄棒（HB）決勝"},
- {s:"19:20",e:"19:35",c:"式典",g:M,t:"表彰式（鉄棒 HB）"}]}
+{d:"2026-10-17",open:"17:00",items:[
+ {s:"17:00",e:"18:50",c:"本会場",g:M,t:"男子予選 第1班",m:"🇨🇦カナダ 🇹🇼台湾 🇫🇷フランス 🇧🇷ブラジル"},
+ {s:"19:10",e:"21:00",c:"本会場",g:M,t:"男子予選 第2班",m:"🇨🇾キプロス 🇷🇺ロシア 🇰🇷韓国 🇺🇦ウクライナ ＋個人選手"},
+ {s:"23:00",e:"00:50",c:"本会場",g:M,t:"男子予選 第3班",m:"🇭🇺ハンガリー 🇪🇬エジプト 🇳🇱オランダ 🇨🇴コロンビア"}]},
+{d:"2026-10-18",open:"01:10",items:[
+ {s:"01:10",e:"03:00",c:"本会場",g:M,t:"男子予選 第4班",m:"🇬🇧英国 🇯🇵日本 🇺🇸米国 🇦🇺豪州"},
+ {s:"17:00",e:"18:50",c:"本会場",g:M,t:"男子予選 第5班",m:"🇧🇪ベルギー 🇮🇹イタリア 🇨🇳中国 🇪🇸スペイン"},
+ {s:"19:10",e:"21:00",c:"本会場",g:M,t:"男子予選 第6班",m:"🇮🇱イスラエル 🇰🇿カザフスタン 🇨🇭スイス 🇩🇪ドイツ"},
+ {s:"23:00",e:"00:20",c:"本会場",g:W,t:"女子予選 第1班",m:"🇩🇪ドイツ 🇷🇴ルーマニア 🇺🇸米国"}]},
+{d:"2026-10-19",open:"00:50",items:[
+ {s:"00:50",e:"02:10",c:"本会場",g:W,t:"女子予選 第2班",m:"🇯🇵日本 🇦🇺豪州 🇧🇪ベルギー"},
+ {s:"02:40",e:"04:00",c:"本会場",g:W,t:"女子予選 第3班",m:"🇮🇹イタリア 🇲🇽メキシコ"},
+ {s:"16:30",e:"17:50",c:"本会場",g:W,t:"女子予選 第4班",m:"🇸🇪スウェーデン 🇧🇾ベラルーシ"},
+ {s:"18:05",e:"19:25",c:"本会場",g:W,t:"女子予選 第5班",m:"🇺🇦ウクライナ 🇩🇿アルジェリア 🇦🇷アルゼンチン"},
+ {s:"19:40",e:"21:00",c:"本会場",g:W,t:"女子予選 第6班",m:"🇫🇷フランス 🇲🇾マレーシア"},
+ {s:"23:00",e:"00:20",c:"本会場",g:W,t:"女子予選 第7班",m:"🇳🇱オランダ 🇬🇧英国 ＋個人選手"}]},
+{d:"2026-10-20",open:"00:35",items:[
+ {s:"00:35",e:"01:55",c:"本会場",g:W,t:"女子予選 第8班",m:"🇨🇦カナダ 🇪🇸スペイン 🇷🇺ロシア"},
+ {s:"02:35",e:"03:55",c:"本会場",g:W,t:"女子予選 第9班",m:"🇨🇭スイス 🇧🇷ブラジル"},
+ {s:"04:10",e:"05:30",c:"本会場",g:W,t:"女子予選 第10班",m:"🇨🇳中国 🇰🇷韓国"}]},
+{d:"2026-10-21",open:"02:30",items:[
+ {s:"02:30",e:"05:30",c:"本会場",g:M,t:"男子 団体決勝（Team Final）"}]},
+{d:"2026-10-22",open:"02:30",items:[
+ {s:"02:30",e:"05:00",c:"本会場",g:W,t:"女子 団体決勝（Team Final）"}]},
+{d:"2026-10-23",open:"02:30",items:[
+ {s:"02:30",e:"05:00",c:"本会場",g:M,t:"男子 個人総合決勝（AA Final）"}]},
+{d:"2026-10-24",open:"02:30",items:[
+ {s:"02:30",e:"05:00",c:"本会場",g:W,t:"女子 個人総合決勝（AA Final）"},
+ {s:"21:00",e:"01:00",c:"本会場",g:M,t:"男子 種目別決勝 1日目",m:"ゆか・あん馬・つり輪"},
+ {s:"21:00",e:"01:00",c:"本会場",g:W,t:"女子 種目別決勝 1日目",m:"跳馬・段違い平行棒"}]},
+{d:"2026-10-25",open:"22:00",items:[
+ {s:"22:00",e:"02:00",c:"本会場",g:M,t:"男子 種目別決勝 2日目",m:"跳馬・平行棒・鉄棒"},
+ {s:"22:00",e:"02:00",c:"本会場",g:W,t:"女子 種目別決勝 2日目",m:"平均台・ゆか"}]}
 ];
 let SCHEDULE=SCHEDULE_DEFAULT;
-const MEET={title:"アジア競技大会2026 体操競技 TO日程",venue:"愛知・名古屋2026／会場表記はPDF準拠"};
+const MEET={title:"世界体操2026 ロッテルダム",venue:"Rotterdam Ahoy｜表示は日本時間（JST）"};
 
 /* ============ 時刻 ============ */
 let fakeOffset=0;
@@ -299,17 +267,18 @@ function tickClock(){
 
 /* ============ ビュー ============ */
 let selDay=null;
-function flat(){const a=[];SCHEDULE.forEach(d=>d.items.forEach(it=>a.push({...it,day:d.d,
-  st:evDate(d.d,it.s),et:evDate(d.d,it.e||it.s)})));return a.sort((x,y)=>x.st-y.st);}
+/* flat(): 終了が開始より前なら日本時間で翌日にまたぐ枠とみなし、et に +1日して xm:true を立てる */
+function flat(){const a=[];SCHEDULE.forEach(d=>d.items.forEach(it=>{
+  const st=evDate(d.d,it.s);let et=evDate(d.d,it.e||it.s),xm=false;
+  if(it.e&&it.e!==it.s&&et<st){et=new Date(et.getTime()+86400000);xm=true;}
+  a.push({...it,day:d.d,st,et,xm});}));return a.sort((x,y)=>x.st-y.st);}
 function statusOf(it,t){
   if(!it.e||it.e===it.s)return t>=it.st?(t-it.st<40*60000?'live':'done'):'wait';
   if(t>=it.et)return'done';if(t>=it.st)return'live';return'wait';}
 const gcls=g=>g==='男子'?'men':g==='女子'?'women':'both';
 const gbadge=g=>g==='男子'?'b-men':g==='女子'?'b-women':'b-both';
 
-/* --- データに実在するカテゴリ／区分だけを自動検出 ---
-   サブが無い大会は c:"サブ" の行が0件になるので、サブタブ・サブのナウボードは自動的に出ない。
-   本会場やサブが男女どちらか一方のデータしか無ければ、その区分は自動で1列表示になる。 */
+/* --- データに実在するカテゴリ／区分だけを自動検出 --- */
 const CATS_PRESENT=[...new Set(SCHEDULE.flatMap(d=>d.items).map(i=>i.c))];
 function gendersIn(cat){
   return [...new Set(SCHEDULE.flatMap(d=>d.items).filter(i=>i.c===cat&&i.g!=='共通').map(i=>i.g))];
@@ -333,20 +302,21 @@ function renderBoard(){
       cell.className='bcell live';
       cell.innerHTML=`<div class="lbl"><span>${label}</span><span class="st">NOW</span></div>`+
         lives.map(i=>`<div class="ttl">${gtag(i)}${esc(i.t)}
-          <span class="sub num">${i.s}–${i.e}（残り <span class="cd">${fmtCd(i.et-t)}</span>）</span></div>`).join('')+
+          <span class="sub num">${i.s}–${i.xm?'翌':''}${i.e}（残り <span class="cd">${fmtCd(i.et-t)}</span>）</span>${i.m?`<div class="bteams">${esc(i.m)}</div>`:''}</div>`).join('')+
         (next?`<div class="sub" style="margin-top:4px">次 ${next.s} ${gtag(next)}${esc(next.t)}</div>`:'');
     }else if(next){
       cell.className='bcell';
       const dd=next.st-t,dys=Math.floor(dd/86400000);
       cell.innerHTML=`<div class="lbl"><span>${label}</span><span>NEXT</span></div>
         <div class="ttl">${gtag(next)}${esc(next.t)}</div>
+        ${next.m?`<div class="bteams">${esc(next.m)}</div>`:''}
         <div class="sub num">${next.day.slice(5).replace('-','/')} ${next.s} 開始（あと ${dys>0?dys+'日 ':''}${fmtCd(dd%86400000)}）</div>`;
     }else{
       cell.className='bcell idle';
       cell.innerHTML=`<div class="lbl"><span>${label}</span></div><div class="ttl">予定はすべて終了しました</div>`;
     }
     box.appendChild(cell);});
-  /* 会議・式典は直近があるときだけ出す */
+  /* 会議・式典は直近があるときだけ出す（今大会はデータ無し） */
   ["会議","式典"].forEach(cat=>{
     const lives=all.filter(i=>i.c===cat&&statusOf(i,t)==='live');
     const next=all.find(i=>i.c===cat&&i.st>t&&i.st-t<24*3600000);
@@ -356,7 +326,7 @@ function renderBoard(){
     cell.className='bcell'+(lives.length?' live':'');
     cell.innerHTML=`<div class="lbl"><span>${cat}</span><span class="${lives.length?'st':''}">${lives.length?'NOW':'NEXT'}</span></div>
       <div class="ttl">${esc(i.t)}</div>
-      <div class="sub num">${i.day.slice(5).replace('-','/')} ${i.s}${i.e&&i.e!==i.s?'–'+i.e:''}
+      <div class="sub num">${i.day.slice(5).replace('-','/')} ${i.s}${i.e&&i.e!==i.s?'–'+(i.xm?'翌':'')+i.e:''}
       ${!lives.length?`（あと ${fmtCd(i.st-t)}）`:''}</div>`;
     box.appendChild(cell);});
 }
@@ -399,8 +369,9 @@ function renderColEvents(container,items,t){
     const el=document.createElement('div');
     el.className=`cev ${gcls(it.g)} ${cls}${it.k?' chk':''}`;
     el.innerHTML=`
-      <div class="ct num">${it.s}${it.e&&it.e!==it.s?'–'+it.e:''}</div>
+      <div class="ct num">${it.s}${it.e&&it.e!==it.s?(it.xm?'–翌':'–')+it.e:''}</div>
       <h4>${esc(it.t)}</h4>
+      ${it.m?`<div class="cteams">${esc(it.m)}</div>`:''}
       <div class="cmeta">
         ${it.k?'<span class="badge b-check">要確認</span>':''}
         ${st==='live'?'<span class="badge b-live">進行中</span>':''}
@@ -434,7 +405,7 @@ function renderTwoCol(container,items,t){
   renderColEvents(wList,women,t);
 }
 
-/* --- 会議／式典：単一列表示 --- */
+/* --- 会議／式典：単一列表示（今大会は未使用） --- */
 function renderSingleCol(container,items,t){
   const wrap=document.createElement('div');wrap.className='rail';
   let lineDone=false;
@@ -448,7 +419,7 @@ function renderSingleCol(container,items,t){
     const el=document.createElement('div');
     el.className=`ev ${gcls(it.g)} ${cls}${it.k?' chk':''}`;
     el.innerHTML=`
-      <div class="t num">${it.s}<small>${it.e&&it.e!==it.s?'▼ '+it.e:''}</small></div>
+      <div class="t num">${it.s}<small>${it.e&&it.e!==it.s?(it.xm?'▼ 翌':'▼ ')+it.e:''}</small></div>
       <h3>${esc(it.t)}</h3>
       <div class="meta">
         <span class="badge ${gbadge(it.g)}">${it.g}</span>
